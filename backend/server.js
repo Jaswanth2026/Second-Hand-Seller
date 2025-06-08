@@ -1,6 +1,5 @@
 import path from 'path'
 import express from 'express'
-
 import dotenv from 'dotenv'
 
 import connectDB from './config/db.js'
@@ -13,6 +12,7 @@ connectDB()
 
 const app = express()
 app.use(express.json())
+
 app.use('/api/products', productRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/uploads', uploadRoutes)
@@ -20,12 +20,14 @@ app.use('/api/uploads', uploadRoutes)
 app.get('/api/config/cloudinary', (req, res) => {
   res.send(process.env.CLOUDINARY_URL)
 })
+
 app.get('/api/config/cloudinarypreset', (req, res) => {
   res.send(process.env.CLOUDINARY_UPLOAD_PRESET)
 })
 
 const __dirname = path.resolve()
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
+
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '/frontend/build')))
   app.get('*', (req, res) =>
@@ -45,6 +47,9 @@ app.use((err, req, res, next) => {
     stack: process.env.NODE_ENV === 'production' ? null : err.stack,
   })
 })
+
+// Define PORT here, fallback to 5000 if not specified in env
+const PORT = process.env.PORT || 5000
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`)
