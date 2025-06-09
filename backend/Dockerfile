@@ -1,21 +1,28 @@
-# Use the official Node.js LTS Alpine image for a lightweight build
-FROM node:18-alpine
+# Use Node.js LTS as base image
+FROM node:18
 
-# Set the working directory inside the container
+# Set working directory inside container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to install dependencies
-COPY package*.json ./
+# Copy backend package.json files and install backend dependencies only
+COPY backend/package*.json ./backend/
+RUN cd backend && npm install
 
-# Install dependencies
-RUN npm install
+# Copy backend source code
+COPY backend/ ./backend/
 
-# Copy the rest of your application code
-COPY . .
+# Copy frontend build (already built by pipeline)
+COPY Frontend/build ./frontend/build
 
-# Expose the port your app runs on
+# Set environment variables
+ENV PORT=4000
+ENV NODE_ENV=production
+
+# Expose the port
 EXPOSE 4000
 
-# Define the command to run your app
-CMD ["npm", "start"]
+# Set working directory to backend for running the app
+WORKDIR /app/backend
 
+# Run the backend server
+CMD ["node", "server.js"]
