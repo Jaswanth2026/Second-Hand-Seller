@@ -28,10 +28,13 @@ app.get('/api/config/cloudinarypreset', (req, res) => {
 const __dirname = path.resolve()
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
+// Serve frontend in production mode
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '/frontend/build')))
+  // Note: frontend build is copied to ../frontend/build relative to backend/server.js
+  app.use(express.static(path.join(__dirname, '../frontend/build')))
+
   app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
+    res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'))
   )
 } else {
   app.get('/', (req, res) => {
@@ -39,6 +42,7 @@ if (process.env.NODE_ENV === 'production') {
   })
 }
 
+// Error handling middleware
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode
   res.status(statusCode)
@@ -48,7 +52,7 @@ app.use((err, req, res, next) => {
   })
 })
 
-// Define PORT here, fallback to 5000 if not specified in env
+// Use port from env or fallback
 const PORT = process.env.PORT || 5000
 
 app.listen(PORT, '0.0.0.0', () => {
